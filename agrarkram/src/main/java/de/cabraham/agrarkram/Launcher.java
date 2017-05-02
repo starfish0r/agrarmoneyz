@@ -12,8 +12,6 @@ import org.openqa.selenium.support.ui.Select;
 
 public class Launcher {
   
-  boolean m_bDebug = true;
-  
   private final WebDriver m_driver;
   
   Launcher(){
@@ -22,8 +20,6 @@ public class Launcher {
 
   public static void main(String[] args) {
     new Launcher().startTheThing();
-    
-
   }
 
   private void startTheThing() {
@@ -33,8 +29,6 @@ public class Launcher {
       SearchParam sp = new SearchParam().withPlz(plz).withAmount("500000");
       searchAndProcess(sp);
     }
-    
-    
   }
 
   private void searchAndProcess(SearchParam sp) {
@@ -45,34 +39,12 @@ public class Launcher {
       e.printStackTrace();
       return;
     }
-    processSearchResultsPage();
+    SearchResultsPage.processSearchResultsPage(m_driver);
   }
 
-  private void processSearchResultsPage() {
-    List<WebElement> lstBegButtons = m_driver.findElements(By.xpath("//button[@class='linkBeg']"));
-    int nCount = lstBegButtons.size();
-    debug("buttons on page: "+nCount);
-    int n = 0;
-    while(n<nCount) {
-      if(n>0){
-        //after the first button we changed the current website so the ids of the old list are not valid anymore
-        lstBegButtons = m_driver.findElements(By.xpath("//button[@class='linkBeg']"));
-      }
-      
-      WebElement btn = lstBegButtons.get(n);
-      btn.click();
-      parseSingleResult();
-      //return;
-      m_driver.navigate().back();
-      n++;
-    }
-    
-  }
+  
 
-  private void parseSingleResult() {
-    final List<WebElement> amounts = m_driver.findElements(By.xpath("//span[@class='betrag']"));
-    System.out.println(amounts.get(amounts.size()-2).getText());
-  }
+
 
   private void performSearch(SearchParam sp) throws SearchResultException {
     if(sp.m_plz != null){
@@ -86,11 +58,6 @@ public class Launcher {
       Select sel = new Select(elDropComparison);
       sel.selectByValue("gt");
     }
-    
-    
-    //System.out.println(elInputPlz);
-    //System.out.println(elInputPlz.getTagName());
-    //System.out.println(elInputPlz.isDisplayed());
     
     WebElement elSubmit = m_driver.findElement(By.xpath("//input[@type='submit']"));
     elSubmit.submit();
@@ -111,10 +78,6 @@ public class Launcher {
     return Arrays.asList("14827");
   }
   
-  void debug(String str){
-    if(m_bDebug){
-      System.out.println(str);
-    }
-  }
+  
 
 }
