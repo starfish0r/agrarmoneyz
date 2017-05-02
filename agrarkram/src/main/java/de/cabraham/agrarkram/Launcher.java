@@ -1,7 +1,13 @@
 package de.cabraham.agrarkram;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
@@ -10,9 +16,15 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.Select;
 
+import de.cabraham.agrarkram.DetailedResult.Tuple;
+
 public class Launcher {
   
   private final WebDriver m_driver;
+  
+  StringBuilder m_sb = new StringBuilder();
+
+  private Map<String, List<DetailedResult>> m_plzMap = new HashMap<>();
   
   Launcher(){
     m_driver = new ChromeDriver();
@@ -21,30 +33,77 @@ public class Launcher {
   public static void main(String[] args) {
     new Launcher().startTheThing();
   }
-
+  
   private void startTheThing() {
     List<String> lstPlz = loadPLZs();
     
     for(String plz:lstPlz) {
-      SearchParam sp = new SearchParam().withPlz(plz).withAmount("500000");
-      searchAndProcess(sp);
+      SearchParam sp = new SearchParam().withPlz(plz);//.withAmount("500000");
+      List<DetailedResult> plzResults = searchAndProcess(sp);
+      m_plzMap.put(plz, plzResults);
+    }
+    
+    //have to do this afterwards since the dictionary might change on the very last entry
+    writeCSVHeader();
+    for(Map.Entry<String, List<DetailedResult>>e:m_plzMap.entrySet()){
+      writeCSV(e.getKey(), e.getValue());
+    }
+    try (FileWriter fw = new FileWriter("out.csv")) {
+      fw.write(m_sb.toString());
+      fw.flush();
+    } catch (IOException e) {
+      e.printStackTrace();
     }
   }
 
-  private void searchAndProcess(SearchParam sp) {
+  private void writeCSVHeader() {
+    m_sb.append("PLZ;Name;Gesamt;");
+    for(Integer i=0;i<Dict.nextKey;i++){
+      m_sb.append(Dict.dict.get(i)).append(';');
+    }
+    m_sb.append("\r\n");
+  }
+
+  private void writeCSV(String plz, List<DetailedResult> plzResults) {
+    for(DetailedResult dr:plzResults){
+      m_sb.append(plz).append(';').append(dr.m_name).append(';').append(dr.total).append(';');
+      for(Integer i=0;i<Dict.nextKey;i++){
+        m_sb.append(getAmountIfKeyPresent(i, dr.values)).append(';');
+      }
+      m_sb.append("\r\n");
+    }
+  }
+
+  private String getAmountIfKeyPresent(Integer i, List<Tuple<Integer, BigDecimal>> values) {
+    for(Tuple<Integer, BigDecimal> t:values){
+      if(i.equals(t.x)){
+        return t.y.toString();
+      }
+    }
+    return "";
+  }
+
+  private List<DetailedResult> searchAndProcess(SearchParam sp) {
     openSearchDialog();
     try {
       performSearch(sp);
     } catch (SearchResultException e) {
       e.printStackTrace();
-      return;
+      return null;
     }
-    SearchResultsPage.processSearchResultsPage(m_driver);
+    PageResult pageResults;
+    List<DetailedResult> lstResults = new LinkedList<>();
+    while(true){
+      pageResults = SearchResultsPage.processSearchResultsPage(m_driver);
+      lstResults.addAll(pageResults.lstResult);
+      if(pageResults.bButWaitTheresMore) {
+        SearchResultsPage.nextPage(m_driver);
+      } else {
+        break; //all pages done
+      }
+    }
+    return lstResults;
   }
-
-  
-
-
 
   private void performSearch(SearchParam sp) throws SearchResultException {
     if(sp.m_plz != null){
@@ -75,6 +134,7 @@ public class Launcher {
   }
 
   private List<String> loadPLZs() {
+    //https://www.suche-postleitzahl.org/sachsen-anhalt.7a
     return Arrays.asList("14827");
   }
   
