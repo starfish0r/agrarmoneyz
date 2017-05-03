@@ -3,11 +3,18 @@ package de.cabraham.agrarkram;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
@@ -134,10 +141,32 @@ public class Launcher {
   }
 
   private List<String> loadPLZs() {
+    try {
+      final List<String> lstPLZs = Files.list(Paths.get("plzfiles")).flatMap(path -> extractPlzs(path).stream()).collect(Collectors.toList());
+    } catch (IOException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+    //Files.list("plzfiles").
     //https://www.suche-postleitzahl.org/sachsen-anhalt.7a
     return Arrays.asList("14827");
   }
   
+  static List<String> extractPlzs(Path p) {
+    String content;
+    try {
+      content = Files.readAllLines(p).stream().collect(Collectors.joining());
+    } catch (IOException e) {
+      e.printStackTrace();
+      return Collections.emptyList();
+    }
+    final Matcher matcher = Pattern.compile("\\d{5}").matcher(content);
+    List<String> ret = new LinkedList<>();
+    while(matcher.find()){
+      ret.add(matcher.group());
+    }
+    return ret;
+  }
   
 
 }
