@@ -77,7 +77,7 @@ public class Launcher {
 
   private void writeCSV(String plz, List<DetailedResult> plzResults) {
     for(DetailedResult dr:plzResults){
-      m_sb.append(plz).append(';').append(dr.m_name).append(';').append(dr.total).append(';');
+      m_sb.append(plz).append(';').append(dr.m_name==null?"":dr.m_name.replace("\"", "")).append(';').append(dr.total).append(';');
       for(Integer i=0;i<Dict.nextKey;i++){
         m_sb.append(getAmountIfKeyPresent(i, dr.values)).append(';');
       }
