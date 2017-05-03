@@ -147,10 +147,12 @@ public class Launcher {
   private Set<String> loadPLZs() {
     Set<String> setPLZs = Collections.emptySet();
     try {
-      List<String> lst = Files.list(Paths.get("plzfiles")).flatMap(path -> extractPlzs(path).stream()).collect(Collectors.toList());
-      //System.out.println(lst.size());
+      List<String> lst = Files.list(Paths.get("plzfiles")).
+                                      filter(path -> !path.toFile().getName().startsWith("-")).
+                                      flatMap(path -> extractPlzs(path).stream()).
+                                      collect(Collectors.toList());
+      Collections.sort(lst);
       setPLZs = ListOrderedSet.listOrderedSet(lst);
-      //System.out.println(setPLZs.size());
     } catch (IOException e) {
       e.printStackTrace();
     }
