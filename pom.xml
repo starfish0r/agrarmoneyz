@@ -4,7 +4,7 @@
   <groupId>de.cabraham</groupId>
   <artifactId>agrarmoneyz</artifactId>
   <version>0.0.1-SNAPSHOT</version>
-  <!-- <build>
+  <build>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -16,9 +16,9 @@
         </configuration>
       </plugin>
     </plugins>
-  </build> -->
+  </build>
 
-  <!-- <dependencies>
+  <dependencies>
     <dependency>
       <groupId>org.seleniumhq.selenium</groupId>
       <artifactId>selenium-java</artifactId>
@@ -29,5 +29,5 @@
       <artifactId>commons-collections4</artifactId>
       <version>4.1</version>
     </dependency>
-  </dependencies> -->
+  </dependencies>
 </project>

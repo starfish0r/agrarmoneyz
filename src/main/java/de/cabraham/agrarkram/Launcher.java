@@ -6,16 +6,17 @@ import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.apache.commons.collections4.set.ListOrderedSet;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
@@ -42,12 +43,15 @@ public class Launcher {
   }
   
   private void startTheThing() {
-    List<String> lstPlz = loadPLZs();
+    Set<String> lstPlz = loadPLZs();
     
     for(String plz:lstPlz) {
-      SearchParam sp = new SearchParam().withPlz(plz);//.withAmount("500000");
+      Log.debug("starting plz "+plz);
+      SearchParam sp = new SearchParam().withPlz(plz).withAmount("100000");
       List<DetailedResult> plzResults = searchAndProcess(sp);
-      m_plzMap.put(plz, plzResults);
+      if(plzResults != null){
+        m_plzMap.put(plz, plzResults);
+      }
     }
     
     //have to do this afterwards since the dictionary might change on the very last entry
@@ -95,7 +99,7 @@ public class Launcher {
     try {
       performSearch(sp);
     } catch (SearchResultException e) {
-      e.printStackTrace();
+      Log.log("No search results: "+e.getMessage());
       return null;
     }
     PageResult pageResults;
@@ -140,16 +144,17 @@ public class Launcher {
     m_driver.get("https://www.agrar-fischerei-zahlungen.de/Suche");
   }
 
-  private List<String> loadPLZs() {
+  private Set<String> loadPLZs() {
+    Set<String> setPLZs = Collections.emptySet();
     try {
-      final List<String> lstPLZs = Files.list(Paths.get("plzfiles")).flatMap(path -> extractPlzs(path).stream()).collect(Collectors.toList());
+      List<String> lst = Files.list(Paths.get("plzfiles")).flatMap(path -> extractPlzs(path).stream()).collect(Collectors.toList());
+      //System.out.println(lst.size());
+      setPLZs = ListOrderedSet.listOrderedSet(lst);
+      //System.out.println(setPLZs.size());
     } catch (IOException e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     }
-    //Files.list("plzfiles").
-    //https://www.suche-postleitzahl.org/sachsen-anhalt.7a
-    return Arrays.asList("14827");
+    return setPLZs;
   }
   
   static List<String> extractPlzs(Path p) {

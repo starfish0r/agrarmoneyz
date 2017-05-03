@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -12,7 +13,12 @@ import de.cabraham.agrarkram.DetailedResult.Tuple;
 public class SingleResultPage {
   static DetailedResult parseSingleResultPage(WebDriver driver) {
     DetailedResult dr = new DetailedResult();
-    dr.m_name = driver.findElement(By.xpath("//div[@id='beguenstigter']/h2")).getText();
+    sleep(100);
+    try {
+      dr.m_name = driver.findElement(By.xpath("//div[@id='beguenstigter']/h2")).getText();
+    } catch (NoSuchElementException e) {
+      Log.log("beguenstigter not found");
+    }
 
     final List<WebElement> lstEntries = driver.findElements(By.xpath("//div[@id='beguenstigter']/h3"));
     for (WebElement we : lstEntries) {
@@ -28,6 +34,12 @@ public class SingleResultPage {
     String strRawTotal = amounts.get(amounts.size() - 2).getText();
     dr.total = parse(strRawTotal);
     return dr;
+  }
+
+  private static void sleep(int i) {
+    try {
+      Thread.sleep(i);
+    } catch (InterruptedException e) { }
   }
 
   private static Tuple<Integer, BigDecimal> fillTuple(String strCategory, BigDecimal bdAmount) {
