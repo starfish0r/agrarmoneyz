@@ -1,10 +1,10 @@
-package de.cabraham.agrarkram;
+package de.cabraham.websiteparser;
 
 public class Log {
   
   static boolean m_bDebug = true;
   
-  static void debug(String str){
+  public static void debug(String str){
     if(m_bDebug){
       System.out.println(str);
     }

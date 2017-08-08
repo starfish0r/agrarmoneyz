@@ -1,4 +1,4 @@
-package de.cabraham.agrarkram;
+package de.cabraham.websiteparser.sites.weingueter_de;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -8,11 +8,14 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-import de.cabraham.agrarkram.DetailedResult.Tuple;
+import de.cabraham.websiteparser.Dict;
+import de.cabraham.websiteparser.Log;
+import de.cabraham.websiteparser.sites.weingueter_de.WeinGueterResult;
+import de.cabraham.websiteparser.sites.weingueter_de.WeinGueterResult.Tuple;
 
-public class SingleResultPage {
-  static DetailedResult parseSingleResultPage(WebDriver driver) {
-    DetailedResult dr = new DetailedResult();
+public class WeinGueterSingleResultPage {
+  static WeinGueterResult parseSingleResultPage(WebDriver driver) {
+    WeinGueterResult dr = new WeinGueterResult();
     sleep(100);
     try {
       dr.m_name = driver.findElement(By.xpath("//div[@id='beguenstigter']/h2")).getText();
@@ -64,12 +67,5 @@ public class SingleResultPage {
     return BigDecimal.valueOf(Double.valueOf(raw));
   }
   
-  
-  public static void main(String[] args) {
-    String d = "1.125.141,20 €";
-    String d2 = "1,125,141.20 €";
-    System.out.println(parse(d).equals(BigDecimal.valueOf(1125141.2)));
-    System.out.println(parse(d2).equals(BigDecimal.valueOf(1125141.2)));
-  }
 
 }

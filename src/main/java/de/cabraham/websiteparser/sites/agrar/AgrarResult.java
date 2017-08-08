@@ -1,10 +1,12 @@
-package de.cabraham.agrarkram;
+package de.cabraham.websiteparser.sites.agrar;
 
 import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
 
-public class DetailedResult {
+import de.cabraham.websiteparser.AbstractSiteResult;
+
+public class AgrarResult extends AbstractSiteResult {
 
   BigDecimal total;
   public String m_name;

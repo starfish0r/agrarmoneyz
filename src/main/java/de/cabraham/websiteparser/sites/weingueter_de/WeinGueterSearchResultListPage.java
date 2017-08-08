@@ -1,4 +1,4 @@
-package de.cabraham.agrarkram;
+package de.cabraham.websiteparser.sites.weingueter_de;
 
 import java.util.List;
 import java.util.regex.Matcher;
@@ -7,17 +7,18 @@ import java.util.regex.Pattern;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.Select;
 
-public class SearchResultsPage {
+import de.cabraham.websiteparser.Log;
+import de.cabraham.websiteparser.PageResult;
+
+public class WeinGueterSearchResultListPage {
   
-  
-  static PageResult processSearchResultsPage(WebDriver m_driver) {
-    PageResult pageResult = new PageResult();
+  static PageResult<WeinGueterResult> processSearchResultsPage(WebDriver m_driver) {
+    PageResult<WeinGueterResult> pageResult = new PageResult<WeinGueterResult>();
     
-    //set max number of rows per page to avoid page change issues
+    /*//set max number of rows per page to avoid page change issues
     Select selectLimit = new Select(m_driver.findElement(By.xpath("//select[@id='limit']")));
-    selectLimit.selectByValue("50");
+    selectLimit.selectByValue("50");*/
     
     //find "page X of Y"
     final int nCurPage = Integer.valueOf(m_driver.findElement(By.xpath("//input[@class='listNavTxtPage']")).getAttribute("value"));
@@ -40,7 +41,7 @@ public class SearchResultsPage {
       //click the entry, parse it, then go back to the search result page
       WebElement btn = lstBegButtons.get(n);
       btn.click();
-      final DetailedResult singleResult = SingleResultPage.parseSingleResultPage(m_driver);
+      final WeinGueterResult singleResult = WeinGueterSingleResultPage.parseSingleResultPage(m_driver);
       pageResult.lstResult.add(singleResult);
       m_driver.navigate().back();
       
