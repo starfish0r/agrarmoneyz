@@ -7,11 +7,15 @@ import java.util.regex.Pattern;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
+
 
 import de.cabraham.websiteparser.Log;
 import de.cabraham.websiteparser.PageResult;
 
 public class WeinGueterSearchResultListPage {
+  
+  private static final String XPATH_RESULT_TABLE = "//div[@id='content']//div[@class='bigbox']//div[@class='middle']//div[@class='inner']";
   
   static PageResult<WeinGueterResult> processSearchResultsPage(WebDriver m_driver) {
     PageResult<WeinGueterResult> pageResult = new PageResult<WeinGueterResult>();
@@ -20,15 +24,39 @@ public class WeinGueterSearchResultListPage {
     Select selectLimit = new Select(m_driver.findElement(By.xpath("//select[@id='limit']")));
     selectLimit.selectByValue("50");*/
     
-    //find "page X of Y"
-    final int nCurPage = Integer.valueOf(m_driver.findElement(By.xpath("//input[@class='listNavTxtPage']")).getAttribute("value"));
-    final String strSeiteVonX = m_driver.findElement(By.xpath("//*[input[@class='listNavTxtPage']]")).getText();
-    final Matcher m = Pattern.compile("Seite\\s+von\\s+(\\d+)").matcher(strSeiteVonX);
+    final int nCurPage = Integer.valueOf(m_driver.findElement(By.xpath(XPATH_RESULT_TABLE + "//table[@class='table_blank']//td//b[2]")).getText());
+    final String linkToLast = m_driver.findElement(By.xpath(XPATH_RESULT_TABLE + "//table[@class='table_blank']//td//a[last()]")).getAttribute("href");
+    
+    final Matcher m = Pattern.compile("page=(\\d+)\\.html").matcher(linkToLast);
     m.find();
     final int nTotalPages = Integer.valueOf(m.group(1));
     
+    
+    
+    final List<WebElement> links = m_driver.findElements(By.xpath(XPATH_RESULT_TABLE + "/table[@class='table']//tr//b/a"));
+    Actions actions = new Actions(m_driver);
+    int i = 0;
+    for(WebElement link:links) {
+      Log.debug("Entry "+(++i)+" of "+links.size()+", page "+nCurPage+"/"+nTotalPages);
+      actions.moveToElement(link).perform();
+      actions.click(link).perform();
+      /*JavaScriptExecutor ex = (JavaScriptExecutor)m_driver;
+      ex.ExecuteScript("arguments[0].click();", link);*/
+      final WeinGueterResult singleResult = WeinGueterSingleResultPage.parseSingleResultPage(m_driver);
+      pageResult.lstResult.add(singleResult);
+      m_driver.navigate().back();
+    }
+    pageResult.bButWaitTheresMore = nCurPage<nTotalPages;
+    
+    
+    
+    /*final String strSeiteVonX = m_driver.findElement(By.xpath("//*[input[@class='listNavTxtPage']]")).getText();
+    final Matcher m = Pattern.compile("Seite\\s+von\\s+(\\d+)").matcher(strSeiteVonX);
+    m.find();
+    final int nTotalPages = Integer.valueOf(m.group(1));*/
+    
     //not all rows lead to a detail page. only the buttons do
-    List<WebElement> lstBegButtons = m_driver.findElements(By.xpath("//button[@class='linkBeg']"));
+    /*List<WebElement> lstBegButtons = m_driver.findElements(By.xpath("//button[@class='linkBeg']"));
     int nCount = lstBegButtons.size();
     
     int n = 0;
@@ -50,7 +78,7 @@ public class WeinGueterSearchResultListPage {
         return pageResult;
       }
       n++;
-    }
+    }*/
     return pageResult;
   }
 

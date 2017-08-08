@@ -1,6 +1,5 @@
 package de.cabraham.websiteparser;
 
-import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,7 +8,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 
 import de.cabraham.websiteparser.sites.weingueter_de.WeinGueterResult;
-import de.cabraham.websiteparser.sites.weingueter_de.WeinGueterResult.Tuple;
 import de.cabraham.websiteparser.sites.weingueter_de.WeingueterDe;
 
 public class Launcher {
@@ -32,6 +30,7 @@ public class Launcher {
     
     ParsableSite<? extends AbstractSiteSearchParam, ? extends AbstractSiteResult> a = new WeingueterDe();
     
+    a.setDriver(m_driver);
     a.openSearchDialog();
     
     AbstractSiteSearchParam sp = a.getSearchParams();
@@ -68,7 +67,7 @@ public class Launcher {
     m_sb.append("\r\n");
   }
 
-  private void writeCSV(String plz, List<WeinGueterResult> plzResults) {
+  /*private void writeCSV(String plz, List<WeinGueterResult> plzResults) {
     for(WeinGueterResult dr:plzResults){
       m_sb.append(plz).append(';').append(dr.m_name==null?"":dr.m_name.replace("\"", "")).append(';').append(dr.total).append(';');
       for(Integer i=0;i<Dict.nextKey;i++){
@@ -85,7 +84,7 @@ public class Launcher {
       }
     }
     return "";
-  }
+  }*/
 
     
   

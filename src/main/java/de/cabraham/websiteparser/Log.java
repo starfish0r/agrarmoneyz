@@ -13,5 +13,9 @@ public class Log {
   public static void log(String str) {
     System.out.println(str);
   }
+  public static void log(String str, Throwable e) {
+    System.out.println(str);
+    e.printStackTrace(System.out);
+  }
 
 }
