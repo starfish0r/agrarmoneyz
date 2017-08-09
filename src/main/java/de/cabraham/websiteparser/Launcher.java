@@ -14,10 +14,6 @@ public class Launcher {
   
   private final WebDriver m_driver;
   
-  StringBuilder m_sb = new StringBuilder();
-
-  
-  
   Launcher(){
     m_driver = new ChromeDriver();
     m_driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);

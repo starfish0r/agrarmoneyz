@@ -4,10 +4,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -21,7 +19,6 @@ import de.cabraham.websiteparser.AbstractParsableSite;
 import de.cabraham.websiteparser.AbstractSiteSearchParam;
 import de.cabraham.websiteparser.PageResult;
 import de.cabraham.websiteparser.SearchResultException;
-import de.cabraham.websiteparser.sites.weingueter_de.WeinGueterResult;
 
 public class Agrar extends AbstractParsableSite<AgrarSearchParam, AgrarResult> {
 
