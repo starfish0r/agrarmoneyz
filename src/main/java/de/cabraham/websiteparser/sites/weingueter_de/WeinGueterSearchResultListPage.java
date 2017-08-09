@@ -9,7 +9,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 
-
 import de.cabraham.websiteparser.Log;
 import de.cabraham.websiteparser.PageResult;
 
@@ -20,10 +19,6 @@ public class WeinGueterSearchResultListPage {
   static PageResult<WeinGueterResult> processSearchResultsPage(WebDriver m_driver) {
     PageResult<WeinGueterResult> pageResult = new PageResult<WeinGueterResult>();
     
-    /*//set max number of rows per page to avoid page change issues
-    Select selectLimit = new Select(m_driver.findElement(By.xpath("//select[@id='limit']")));
-    selectLimit.selectByValue("50");*/
-    
     final int nCurPage = Integer.valueOf(m_driver.findElement(By.xpath(XPATH_RESULT_TABLE + "//table[@class='table_blank']//td//b[2]")).getText());
     final String linkToLast = m_driver.findElement(By.xpath(XPATH_RESULT_TABLE + "//table[@class='table_blank']//td//a[last()]")).getAttribute("href");
     
@@ -31,59 +26,36 @@ public class WeinGueterSearchResultListPage {
     m.find();
     final int nTotalPages = Integer.valueOf(m.group(1));
     
-    
-    
-    final List<WebElement> links = m_driver.findElements(By.xpath(XPATH_RESULT_TABLE + "/table[@class='table']//tr//b/a"));
+    List<WebElement> rows = m_driver.findElements(By.xpath(XPATH_RESULT_TABLE + "/table[@class='table']//tr[td[1]//a]"));
     Actions actions = new Actions(m_driver);
-    int i = 0;
-    for(WebElement link:links) {
-      Log.debug("Entry "+(++i)+" of "+links.size()+", page "+nCurPage+"/"+nTotalPages);
+    for(int i = 0;i<rows.size();i++) {
+      if(i > 0) {
+        //we use back() to get to the search page again, invalidating the previous document
+        rows = m_driver.findElements(By.xpath(XPATH_RESULT_TABLE + "/table[@class='table']//tr[td[1]//a]"));
+      }
+      WebElement row = rows.get(i);
+      WebElement link = row.findElement(By.xpath("td[1]//a"));
+      Log.debug("Entry "+(i+1)+" of "+rows.size()+", page "+nCurPage+"/"+nTotalPages);
+      //get the Region, which is in the 2nd table colum of the link above
+      String region = row.findElement(By.xpath("td[2]//a")).getText();
+      String name = link.getText();
       actions.moveToElement(link).perform();
       actions.click(link).perform();
-      /*JavaScriptExecutor ex = (JavaScriptExecutor)m_driver;
-      ex.ExecuteScript("arguments[0].click();", link);*/
       final WeinGueterResult singleResult = WeinGueterSingleResultPage.parseSingleResultPage(m_driver);
+      singleResult.region = region;
+      singleResult.name = name;
       pageResult.lstResult.add(singleResult);
       m_driver.navigate().back();
     }
     pageResult.bButWaitTheresMore = nCurPage<nTotalPages;
-    
-    
-    
-    /*final String strSeiteVonX = m_driver.findElement(By.xpath("//*[input[@class='listNavTxtPage']]")).getText();
-    final Matcher m = Pattern.compile("Seite\\s+von\\s+(\\d+)").matcher(strSeiteVonX);
-    m.find();
-    final int nTotalPages = Integer.valueOf(m.group(1));*/
-    
-    //not all rows lead to a detail page. only the buttons do
-    /*List<WebElement> lstBegButtons = m_driver.findElements(By.xpath("//button[@class='linkBeg']"));
-    int nCount = lstBegButtons.size();
-    
-    int n = 0;
-    while(n<nCount) {
-      if(n>0){
-        //after the first button we changed the current website so the ids of the old list are not valid anymore
-        lstBegButtons = m_driver.findElements(By.xpath("//button[@class='linkBeg']"));
-      }
-      Log.debug("Entry "+(n+1)+" of "+nCount+", page "+nCurPage+"/"+nTotalPages);
-      //click the entry, parse it, then go back to the search result page
-      WebElement btn = lstBegButtons.get(n);
-      btn.click();
-      final WeinGueterResult singleResult = WeinGueterSingleResultPage.parseSingleResultPage(m_driver);
-      pageResult.lstResult.add(singleResult);
-      m_driver.navigate().back();
-      
-      if(n==nCount-1) {//end reached
-        pageResult.bButWaitTheresMore = nCurPage<nTotalPages;
-        return pageResult;
-      }
-      n++;
-    }*/
+
     return pageResult;
   }
 
-  public static void nextPage(WebDriver m_driver) {
-    m_driver.findElement(By.xpath("//input[@class='listNavSubNext']")).click();
+  public static void nextPage(WebDriver driver) {
+    Actions actions = new Actions(driver);
+    final WebElement nextPageLink = driver.findElement(By.xpath(XPATH_RESULT_TABLE + "//a[img[@src='/img/arrow.gif']]"));
+    actions.moveToElement(nextPageLink).click().perform();
   }
 
 }

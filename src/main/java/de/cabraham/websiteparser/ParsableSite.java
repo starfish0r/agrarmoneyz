@@ -12,8 +12,10 @@ public interface ParsableSite<SPT extends AbstractSiteSearchParam, RT extends Ab
   
   void performSearch(AbstractSiteSearchParam sp) throws SearchResultException;
   
-  List<RT> processResultList();
+  List<RT> processSearchResultList();
 
   SPT getSearchParams();
+
+  void doTheReport(List<RT> processSearchResultList);
 
 }

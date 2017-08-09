@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -19,6 +21,7 @@ import de.cabraham.websiteparser.AbstractParsableSite;
 import de.cabraham.websiteparser.AbstractSiteSearchParam;
 import de.cabraham.websiteparser.PageResult;
 import de.cabraham.websiteparser.SearchResultException;
+import de.cabraham.websiteparser.sites.weingueter_de.WeinGueterResult;
 
 public class Agrar extends AbstractParsableSite<AgrarSearchParam, AgrarResult> {
 
@@ -57,7 +60,7 @@ public class Agrar extends AbstractParsableSite<AgrarSearchParam, AgrarResult> {
 
 
   @Override
-  public List<AgrarResult> processResultList() {
+  public List<AgrarResult> processSearchResultList() {
     PageResult<AgrarResult> pageResults;
     List<AgrarResult> lstResults = new LinkedList<>();
     while(true){
@@ -90,6 +93,8 @@ public class Agrar extends AbstractParsableSite<AgrarSearchParam, AgrarResult> {
     }
   }*/
   
+  /*private Map<String, List<WeinGueterResult>> m_plzMap = new HashMap<>();*/
+  
   
   static List<String> extractPlzs(Path p) {
     String content;
@@ -105,6 +110,13 @@ public class Agrar extends AbstractParsableSite<AgrarSearchParam, AgrarResult> {
       ret.add(matcher.group());
     }
     return ret;
+  }
+
+
+  @Override
+  public void doTheReport(List<AgrarResult> processSearchResultList) {
+    // TODO Auto-generated method stub
+    
   }
 
 

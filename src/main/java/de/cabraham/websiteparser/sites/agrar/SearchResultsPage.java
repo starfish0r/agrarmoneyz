@@ -11,7 +11,6 @@ import org.openqa.selenium.support.ui.Select;
 
 import de.cabraham.websiteparser.Log;
 import de.cabraham.websiteparser.PageResult;
-import de.cabraham.websiteparser.sites.weingueter_de.WeinGueterResult;
 
 public class SearchResultsPage {
   
