@@ -24,6 +24,10 @@ public class Launcher {
   }
   
   private void startTheThing() {
+
+
+
+
     ParsableSite<WeinGueterSearchParam, WeinGueterResult> a = new WeingueterDe();
     
     a.setDriver(m_driver);
